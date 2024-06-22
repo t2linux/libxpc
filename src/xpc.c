@@ -39,6 +39,7 @@ xpc_object_t xpc_bool_create(bool value) {
     return v;
 }
 bool xpc_bool_get_value(xpc_object_t obj) {
+	//TODO: Ensure these can't be used on wrong types of xpc objects
     struct xpc_value *v = (struct xpc_value *) obj;
     return XPC_VALUE(v, bool);
 }
@@ -158,6 +159,26 @@ static void _xpc_dictionary_free(xpc_object_t obj) {
     }
     free(obj);
 }
+static struct xpc_dict_el *xpc_dictionary_find_el_by_index(xpc_object_t obj, int idx) {
+    struct xpc_dict *dict = (struct xpc_dict *) obj;
+    struct xpc_dict_el *el;
+    for (int j = 0; j < XPC_DICT_NBUCKETS; j++) {
+        el = dict->buckets[j];
+        while (el) {
+            if (idx == 0)
+                return el;
+            el = el->next;
+            idx--;
+        }
+    }
+    return NULL;
+}
+
+const char *xpc_dictionary_get_key_by_index(xpc_object_t obj, int index) {
+    struct xpc_dict_el *el = xpc_dictionary_find_el_by_index(obj, index);
+    return el ? el->key : NULL;
+}
+
 static struct xpc_dict_el *xpc_dictionary_find_el(xpc_object_t obj, const char *key, unsigned long key_hash) {
     struct xpc_dict *dict = (struct xpc_dict *) obj;
     struct xpc_dict_el *el;

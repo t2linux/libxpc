@@ -116,6 +116,7 @@ static size_t _xpc_serialize(xpc_object_t o, uint8_t *buf) {
         case XPC_ARRAY:
             return _xpc_array_serialize(o, buf);
         default:
+        	printf("Unimplemented XPC type: 0x%x\n", v->type);
             break;
     }
     return buf - buf_i;
@@ -210,6 +211,9 @@ static xpc_object_t _xpc_deserialize(const uint8_t *buf, size_t *offp, size_t le
         case XPC_ARRAY:
             *offp = off;
             return _xpc_deserialize_array(buf, offp, len);
+        default:
+        	printf("Unimplemented XPC type: 0x%x\n", type);
+            break;
     }
     *offp = off;
     return ret;
